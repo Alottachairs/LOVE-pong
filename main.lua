@@ -1,4 +1,3 @@
-
 function love.load()
 	x, y, w, h = 10, 0, 20, 100  --player paddle
 	ox,oy =  570 , 0
@@ -10,6 +9,7 @@ function love.load()
 	width = 600
 	dr,dg,db = 1,1,1
 	score = 0
+	speedup = 1
 
 	love.window.setMode(width, height, {resizable=true, 
 										vsync=0, 
@@ -33,6 +33,11 @@ function playerLost()
 	cx, cy = width/2, height/2
 end
 
+function speedBall() -- increases ball speed over time
+	speedup = speedup + 0.001
+end
+
+
 function love.update(dt)
 
 	x = x + dx
@@ -44,14 +49,19 @@ function love.update(dt)
 		dy = 0
 	end
 
-	cx = cx + cdx
-	cy = cy + cdy
+	cx = cx + (cdx * speedup)
+	cy = cy + (cdy * speedup)
 
-	oy = cy - 50  --Sets computer y position
+	if cy > oy then
+		oy = oy + 1
+	elseif cy < oy then
+		oy = oy -1
+	end
 
 	if cx > width then
 		cdx = -1
 		colorChange()
+		speedBall()
 	elseif cx < 20 then
 		if y < cy and (y+100) > cy then
 			cdx = 1
@@ -59,12 +69,15 @@ function love.update(dt)
 			playerLost()
 		end
 		colorChange()
+		speedBall()
 	elseif cy > height then
 		cdy = - 1
 		colorChange()
+		speedBall()
 	elseif cy < 0 then
 		cdy = 1
 		colorChange()
+		speedBall()
 	end
 
 	function love.keypressed(key, scancode, isrepeat)
